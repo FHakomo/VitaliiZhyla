@@ -13,7 +13,12 @@ builder.Services.AddRepositories();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var app = builder.Build();
+
+var environment = builder.Environment.EnvironmentName;
+
+Console.WriteLine($" === Запуск у середовищі: {environment} ===");
 
 if (app.Environment.IsDevelopment())
 {

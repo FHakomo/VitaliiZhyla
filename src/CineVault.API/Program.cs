@@ -26,6 +26,13 @@ if (app.Environment.IsDevelopment())
    app.UseSwaggerWithOptions();
 }
 
+
+// Виведення Developer Exception Page для локального середовища
+if (app.Environment.isLocal())
+{
+    app.UseDeveloperExceptionPage();
+}
+
 app.UseHttpsRedirection();
 
 app.MapControllers();

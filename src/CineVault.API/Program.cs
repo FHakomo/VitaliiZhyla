@@ -17,6 +17,7 @@ builder.Services.AddSwaggerWithOptions();
 
 var app = builder.Build();
 
+
 var environment = builder.Environment.EnvironmentName;
 
 Console.WriteLine($" === Запуск у середовищі: {environment} ===");
@@ -28,7 +29,7 @@ if (app.Environment.IsDevelopment())
 
 
 // Виведення Developer Exception Page для локального середовища
-if (app.Environment.isLocal())
+if (app.Environment.IsLocal())
 {
     app.UseDeveloperExceptionPage();
 }

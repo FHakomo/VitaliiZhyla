@@ -9,7 +9,7 @@ builder.Services.AddCineVaultDbContext(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddRepositories();
-
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApiVersioningWithApiExplorer();
 builder.Services.AddSwaggerWithOptions();
 

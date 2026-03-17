@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace CineVault.API.Controllers;
 public class AppInfoController : Controller
 {
-    [ApiVersion(1.0)]
+    [ApiVersion(1.0, Deprecated = true)]
+    [ApiVersion(2.0)]
     [Route("api/v{version:apiVersion}/environment")]
-    public IActionResult GetEnvironment()
+    [HttpGet, MapToApiVersion(1.0)]
+    public IActionResult GetEnvironmentV1()
     {
         // Отримуємо значення змінної середовища ASPNETCORE_ENVIRONMENT
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown";
@@ -15,4 +17,12 @@ public class AppInfoController : Controller
         return Ok(new { Environment = environment });
     }
 
+    [HttpGet, MapToApiVersion(2.0)]
+    public IActionResult GetEnvironmentV2()
+    {
+        // Отримуємо значення змінної середовища ASPNETCORE_ENVIRONMENT
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown";
+        // Повертаємо значення у відповіді
+        return Ok(new { Environment = environment, Response = "V2" });
+    }
 }

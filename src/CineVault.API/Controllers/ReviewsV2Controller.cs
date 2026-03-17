@@ -5,13 +5,13 @@ using CineVault.API.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CineVault.API.Controllers;
-[ApiVersion(1.0, Deprecated = true)]
+[ApiVersion(2.0)]
 [Route("api/v{version:apiVersion}/[controller]/[action]")]
-public sealed class ReviewsController : ControllerBase
+public sealed class ReviewsV2Repository : ControllerBase
 {
     private readonly IReviewRepository reviewRepository;
 
-    public ReviewsController(IReviewRepository reviewRepository)
+    public ReviewsV2Repository(IReviewRepository reviewRepository)
     {
         this.reviewRepository = reviewRepository;
     }
@@ -23,7 +23,7 @@ public sealed class ReviewsController : ControllerBase
 
         var responses = reviews.Select(ReviewResponse.FromEntity);
 
-        return base.Ok(responses);
+        return base.Ok(new { Version = "V2", Response = responses });
     }
 
     [HttpGet("{id}")]
@@ -36,7 +36,7 @@ public sealed class ReviewsController : ControllerBase
             return base.NotFound();
         }
 
-        return base.Ok(ReviewResponse.FromEntity(review));
+        return base.Ok(new { Version = "V2", Response = ReviewResponse.FromEntity(review) });
     }
 
     [HttpPost]
@@ -63,7 +63,7 @@ public sealed class ReviewsController : ControllerBase
 
         await this.reviewRepository.Update(review);
 
-        return base.Ok();
+        return base.Ok(new { Version = "V2", Response = review});
     }
 
     [HttpDelete("{id}")]
@@ -78,6 +78,6 @@ public sealed class ReviewsController : ControllerBase
 
         await this.reviewRepository.Delete(review);
 
-        return base.NoContent();
+        return base.Ok(new { Version = "V2" });
     }
 }

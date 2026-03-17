@@ -9,15 +9,13 @@ namespace CineVault.API.Configuration;
 public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 {
     private readonly IServiceProvider provider;
-
     public ConfigureSwaggerOptions(IServiceProvider provider)
     {
         this.provider = provider;
     }
-
     public void Configure(SwaggerGenOptions options)
     {
-        using var scope = this.provider.CreateScope();
+    using var scope = this.provider.CreateScope();
         var DescriptionProvider = scope.ServiceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
         foreach (var description in DescriptionProvider.ApiVersionDescriptions)
         {
@@ -32,6 +30,4 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
  : "The current stable version of the API."
             });
         }
-    }
-
-}
+    }}

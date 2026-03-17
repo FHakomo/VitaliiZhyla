@@ -10,7 +10,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddRepositories();
 
-
 builder.Services.AddApiVersioningWithApiExplorer();
 builder.Services.AddSwaggerWithOptions();
 
@@ -24,7 +23,7 @@ Console.WriteLine($" === Запуск у середовищі: {environment} ===");
 
 if (app.Environment.IsDevelopment())
 {
-   app.UseSwaggerWithOptions();
+    app.UseSwaggerWithOptions();
 }
 
 

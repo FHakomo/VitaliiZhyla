@@ -4,7 +4,7 @@ public class ApiRequest
 {
     public required string RequestId { get; set; }
     public DateTime RequestTime { get; set; } = DateTime.UtcNow;
-    public string? ClientVersion { get; set; }
+    public string? ClientVersion { get; set; } = "V3";
     public Dictionary<string, object>? Metadata { get; set; }
 }
 public class ApiRequest<T> : ApiRequest

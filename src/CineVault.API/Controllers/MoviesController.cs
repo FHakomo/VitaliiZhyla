@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CineVault.API.Controllers;
 
-[ApiVersion(1.0)]
+[ApiVersion(1.0, Deprecated = true)]
 [Route("api/v{version:apiVersion}/[controller]/[action]")]
 
 

@@ -20,6 +20,7 @@ public class AppInfoControllerV3 : BaseV3Controller
 
     [ApiVersion(3.0)]
     [Route("api/v{version:apiVersion}/[controller]/[action]")]
+    [HttpPost]
     public IActionResult GetEnvironmentV3([FromBody] ApiRequest request)
     {
         var data = new {Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown",

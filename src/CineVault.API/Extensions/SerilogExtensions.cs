@@ -2,9 +2,9 @@
 
 namespace CineVault.API.Extensions;
 
-public class SerilogExtensions
+public static class SerilogExtensions
 {
-    public static IHostBuilder AddLogging(IHostBuilder hostBuilder)
+    public static IHostBuilder AddLogging(this IHostBuilder hostBuilder)
     {
         Log.Logger = new LoggerConfiguration()
          .MinimumLevel.Information()

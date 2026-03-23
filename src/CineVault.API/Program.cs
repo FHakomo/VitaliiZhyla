@@ -1,11 +1,16 @@
 using CineVault.API.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 [assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCineVaultDbContext(builder.Configuration);
+builder.Host.AddLogging();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
 
+
+builder.Services.AddCineVaultDbContext(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddRepositories();

@@ -6,10 +6,10 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.AddLogging();
+
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog();
-
+builder.AddLogging();
 
 builder.Services.AddCineVaultDbContext(builder.Configuration);
 builder.Services.AddControllers();

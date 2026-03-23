@@ -26,7 +26,7 @@ public sealed class MoviesController : ControllerBase
 
         var response = movies.Select(MovieResponse.FromEntity);
 
-        logger.LogInformation("Retrieved {Count} movies", response.Count());
+        logger.LogInformation("Retrieved {MoviesCount} movies", response.Count());
         return base.Ok(response);
     }
 
@@ -37,11 +37,11 @@ public sealed class MoviesController : ControllerBase
 
         if (movie is null)
         {
-            logger.LogWarning("Movie with ID {Id} not found", id);
+            logger.LogWarning("Movie with ID {MovieId} not found", id);
             return base.NotFound();
         }
 
-        logger.LogInformation("Retrieved movie with ID {Id}", id);
+        logger.LogInformation("Retrieved movie with ID {MovieId}", id);
         return base.Ok(MovieResponse.FromEntity(movie));
     }
 
@@ -52,7 +52,7 @@ public sealed class MoviesController : ControllerBase
 
         await this.movieRepository.Create(movie);
 
-        logger.LogInformation("Created new movie with ID {Id}", movie.Id);
+        logger.LogInformation("Created new movie with ID {MovieId}", movie.Id);
         return base.Created();
     }
 
@@ -63,14 +63,14 @@ public sealed class MoviesController : ControllerBase
 
         if (movie is null)
         {
-            logger.LogWarning("Movie with ID {Id} not found for update", id);
+            logger.LogWarning("Movie with ID {MovieId} not found for update", id);
             return base.NotFound();
         }
 
         request.ApplyTo(movie);
 
         await this.movieRepository.Update(movie);
-        logger.LogInformation("Updated movie with ID {Id}", id);
+        logger.LogInformation("Updated movie with ID {MovieId}", id);
         return base.Ok();
     }
 
@@ -81,13 +81,13 @@ public sealed class MoviesController : ControllerBase
 
         if (movie is null)
         {
-            logger.LogWarning("Movie with ID {Id} not found for deletion", id);
+            logger.LogWarning("Movie with ID {MovieId} not found for deletion", id);
             return base.NotFound();
         }
 
         await this.movieRepository.Delete(movie);
 
-        logger.LogInformation("Deleted movie with ID {Id}", id);
+        logger.LogInformation("Deleted movie with ID {MovieId}", id);
         return base.NoContent();
     }
 }

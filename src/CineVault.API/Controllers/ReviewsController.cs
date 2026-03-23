@@ -9,10 +9,12 @@ namespace CineVault.API.Controllers;
 public sealed class ReviewsController : ControllerBase
 {
     private readonly IReviewRepository reviewRepository;
+    private readonly ILogger<ReviewsController> logger;
 
-    public ReviewsController(IReviewRepository reviewRepository)
+    public ReviewsController(IReviewRepository reviewRepository, ILogger<ReviewsController> logger)
     {
         this.reviewRepository = reviewRepository;
+        this.logger = logger;
     }
 
     [HttpGet]
@@ -22,6 +24,7 @@ public sealed class ReviewsController : ControllerBase
 
         var responses = reviews.Select(ReviewResponse.FromEntity);
 
+        logger.LogInformation("Retrieved {ReviewCount} reviews", responses.Count());
         return base.Ok(responses);
     }
 
@@ -32,9 +35,11 @@ public sealed class ReviewsController : ControllerBase
 
         if (review is null)
         {
+            logger.LogWarning("Review with ID {ReviewId} not found", id);
             return base.NotFound();
         }
 
+        logger.LogInformation("Retrieved review with ID {ReviewId}", id);
         return base.Ok(ReviewResponse.FromEntity(review));
     }
 
@@ -45,6 +50,7 @@ public sealed class ReviewsController : ControllerBase
 
         await this.reviewRepository.Create(review);
 
+        logger.LogInformation("Created new review with ID {ReviewId}", review.Id);
         return base.Created();
     }
 
@@ -55,6 +61,7 @@ public sealed class ReviewsController : ControllerBase
 
         if (review is null)
         {
+            logger.LogWarning("Review with ID {ReviewId} not found for update", id);
             return base.NotFound();
         }
 
@@ -62,6 +69,7 @@ public sealed class ReviewsController : ControllerBase
 
         await this.reviewRepository.Update(review);
 
+        logger.LogInformation("Updated review with ID {ReviewId}", id);
         return base.Ok();
     }
 
@@ -72,11 +80,12 @@ public sealed class ReviewsController : ControllerBase
 
         if (review is null)
         {
+            logger.LogWarning("Review with ID {ReviewId} not found for deletion", id);
             return base.NotFound();
         }
 
         await this.reviewRepository.Delete(review);
-
+        logger.LogInformation("Deleted review with ID {ReviewId}", id);
         return base.NoContent();
     }
 }

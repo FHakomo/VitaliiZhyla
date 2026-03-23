@@ -32,4 +32,8 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Controllers\V3\" />
+	</ItemGroup>
+
 </Project>

@@ -27,10 +27,7 @@ public class AppInfoControllerV3 : BaseV3Controller
 
         this.logger.LogInformation("Environment were sent"); 
         return base.Ok(ApiResponse<object?>.Ok(data, request.RequestId, "Environment Information"));
-        // Отримуємо значення змінної середовища ASPNETCORE_ENVIRONMENT
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown";
-        // Повертаємо значення у відповіді
-        return Ok(new { Environment = environment });
+
     }
 
 }

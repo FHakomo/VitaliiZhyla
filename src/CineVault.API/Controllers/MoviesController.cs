@@ -1,4 +1,5 @@
-﻿using CineVault.API.Controllers.Requests;
+﻿using Asp.Versioning;
+using CineVault.API.Controllers.Requests;
 using CineVault.API.Controllers.Responses;
 using CineVault.API.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CineVault.API.Controllers;
 
-[Route("api/[controller]/[action]")]
+[ApiVersion(1.0, Deprecated = true)]
+[Route("api/v{version:apiVersion}/[controller]/[action]")]
+
 
 public sealed class MoviesController : ControllerBase
 {

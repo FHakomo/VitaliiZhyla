@@ -1,7 +1,11 @@
-﻿using CineVault.API.Data.Entities;
+﻿using Asp.Versioning;
+using CineVault.API.Configuration;
+using CineVault.API.Data.Entities;
 using CineVault.API.Data.Interfaces;
 using CineVault.API.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace CineVault.API.Extensions;
 
@@ -33,4 +37,29 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddApiVersioningWithApiExplorer(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.ReportApiVersions = true;
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
+        })
+        .AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
+        return services;
+    }
+    public static IServiceCollection AddSwaggerWithOptions(this IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+        return services;
+    }
+
 }

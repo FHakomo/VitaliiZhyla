@@ -15,9 +15,11 @@ builder.Services.AddCineVaultDbContext(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddRepositories();
+builder.Services.AddApiVersioningWithApiExplorer();
+builder.Services.AddSwaggerWithOptions();
 
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
 
 
 var app = builder.Build();
@@ -29,8 +31,7 @@ Console.WriteLine($" === Запуск у середовищі: {environment} ===");
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerWithOptions();
 }
 
 

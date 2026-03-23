@@ -1,11 +1,17 @@
+using CineVault.API;
 using CineVault.API.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 [assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCineVaultDbContext(builder.Configuration);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
+builder.AddLogging();
+
+builder.Services.AddCineVaultDbContext(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddRepositories();
@@ -35,7 +41,7 @@ if (app.Environment.IsLocal())
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<PerformanceLoggingMiddleware>();
 app.MapControllers();
 
 await app.RunAsync();

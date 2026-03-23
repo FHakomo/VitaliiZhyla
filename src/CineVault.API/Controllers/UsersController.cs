@@ -9,10 +9,12 @@ namespace CineVault.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository userRepository;
+    private readonly ILogger<UsersController> logger;
 
-    public UsersController(IUserRepository userRepository)
+    public UsersController(IUserRepository userRepository, ILogger<UsersController> logger)
     {
         this.userRepository = userRepository;
+        this.logger = logger;
     }
 
     [HttpGet]
@@ -22,6 +24,7 @@ public class UsersController : ControllerBase
 
         var response = users.Select(UserResponse.FromEntity);
 
+        logger.LogInformation("Retrieved {UsersCount} users", response.Count());
         return base.Ok(response);
     }
 
@@ -32,9 +35,11 @@ public class UsersController : ControllerBase
 
         if (user is null)
         {
+            logger.LogWarning("User with ID {UserId} not found", id);
             return base.NotFound();
         }
 
+        logger.LogInformation("Retrieved user with ID {UserId}", id);
         return base.Ok(UserResponse.FromEntity(user));
     }
 
@@ -45,6 +50,7 @@ public class UsersController : ControllerBase
 
         await this.userRepository.Create(user);
 
+        logger.LogInformation("Created new user with ID {UserId}", user.Id);
         return base.Ok();
     }
 
@@ -55,6 +61,7 @@ public class UsersController : ControllerBase
 
         if (user is null)
         {
+            logger.LogWarning("User with ID {UserId} not found for update", id);
             return base.NotFound();
         }
 
@@ -62,6 +69,7 @@ public class UsersController : ControllerBase
 
         await this.userRepository.Update(user);
 
+        logger.LogInformation("Updated user with ID {UserId}", id);
         return base.Ok();
     }
 
@@ -72,11 +80,13 @@ public class UsersController : ControllerBase
 
         if (user is null)
         {
+            logger.LogWarning("User with ID {UserId} not found for deletion", id);
             return base.NotFound();
         }
 
         await this.userRepository.Delete(user);
 
+        logger.LogInformation("Deleted user with ID {UserId}", id);
         return base.NoContent();
     }
 }

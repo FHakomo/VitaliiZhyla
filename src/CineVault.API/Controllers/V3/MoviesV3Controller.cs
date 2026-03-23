@@ -68,7 +68,7 @@ public class MoviesV3Controller : BaseV3Controller
 
     }
 
-    [HttpPost("{id:int}")]
+    [HttpPost]
     public async Task<ActionResult<ApiResponse<MovieResponse>>> CreateMovie([FromBody] ApiRequest<MovieRequest> request)
     {
         this.logger.LogInformation("Received request to create movie with RequestId: {RequestId}", request.RequestId);
@@ -80,7 +80,7 @@ public class MoviesV3Controller : BaseV3Controller
         }
         await this.movieRepository.Create(movie);
         this.logger.LogInformation("Created new movie with ID {MovieId}. RequestId: {RequestId}", movie.Id, request.RequestId);
-        return Ok(MovieResponse.FromEntity(movie), request.RequestId, $"Movie with id {movie.Id} created successfully. RequestId = {request.RequestId}");
+        return Created(MovieResponse.FromEntity(movie), request.RequestId, $"Movie with id {movie.Id} created successfully. RequestId = {request.RequestId}");
     }
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult<ApiResponse<object?>>> DeleteMovie(

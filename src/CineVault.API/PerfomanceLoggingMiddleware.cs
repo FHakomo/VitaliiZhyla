@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
+using CineVault.API.Extensions;
 
 namespace CineVault.API;
 
-public class PerformanceLoggingMiddleware
+public partial class PerformanceLoggingMiddleware
 {
     private readonly RequestDelegate next;
     private readonly ILogger<PerformanceLoggingMiddleware> logger;
@@ -25,14 +26,17 @@ public class PerformanceLoggingMiddleware
             var path = context.Request.Path.Value ?? "";
             var method = context.Request.Method;
             var duration = stopwatch.ElapsedMilliseconds;
-            this.logger.LogInformation(
-            "HTTP {Method} {Path} responded {StatusCode} in {Duration}ms",
-            method, path, context.Response.StatusCode, duration);
+            LogRequest(logger, method, path, context.Response.StatusCode, duration);
             // Додаткове логування повільних запитів
             if (duration > 500)
             {
-                this.logger.LogWarning("Slow request detected: {Method} {Path}took { Duration}ms", method, path, duration);
+                LogSlowRequest(logger, method, path, duration);
             }
         }
     }
+    [LoggerMessage(Level = LogLevel.Information, Message = "HTTP {Method} {Path} responded {StatusCode} in {Duration}ms")]
+    private static partial void LogRequest(ILogger logger, string method, string path, int statusCode, long duration);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Slow request detected: {Method} {Path} took {Duration}ms")]
+    private static partial void LogSlowRequest(ILogger logger, string method, string path, long duration);
 }

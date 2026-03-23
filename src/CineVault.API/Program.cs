@@ -1,3 +1,4 @@
+using CineVault.API;
 using CineVault.API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -40,7 +41,7 @@ if (app.Environment.IsLocal())
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<PerformanceLoggingMiddleware>();
 app.MapControllers();
 
 await app.RunAsync();

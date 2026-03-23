@@ -18,6 +18,7 @@ builder.Services.AddRepositories();
 builder.Services.AddApiVersioningWithApiExplorer();
 builder.Services.AddSwaggerWithOptions();
 
+builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 
 

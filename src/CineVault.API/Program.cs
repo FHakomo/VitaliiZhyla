@@ -1,5 +1,6 @@
 using CineVault.API;
 using CineVault.API.Extensions;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 [assembly: ApiController]
@@ -20,6 +21,7 @@ builder.Services.AddSwaggerWithOptions();
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddMapstter();
 
 
 var app = builder.Build();

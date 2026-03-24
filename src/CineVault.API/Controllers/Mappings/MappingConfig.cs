@@ -36,11 +36,16 @@ public class MappingConfig : IRegister
 
         config.NewConfig<ReviewRequest, Review>()
             .Map(dest => dest.Rating, src => src.Rating)
-            .Map(dest => dest.Comment, src => src.Comment);
+            .Map(dest => dest.Comment, src => src.Comment)
+            .Map(dest => dest.MovieId, src => src.MovieId)
+            .Map(dest => dest.UserId, src => src.UserId);
+
         config.NewConfig<Review, ReviewResponse>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.MovieId, src => src.MovieId)
+            .Map(dest => dest.MovieTitle, src => src.Movie.Title)
             .Map(dest => dest.UserId, src => src.UserId)
+            .Map(dest => dest.Username, src => src.User.Username)
             .Map(dest => dest.Rating, src => src.Rating)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.CreatedAt, src => src.CreatedAt);

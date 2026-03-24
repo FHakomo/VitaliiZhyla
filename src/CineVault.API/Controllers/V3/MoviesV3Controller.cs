@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using CineVault.API.Controllers.Requests;
 using CineVault.API.Controllers.Responses;
 using CineVault.API.Data.Interfaces;
+using Mapster;
+using MapsterMapper;
+using CineVault.API.Data.Entities;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -14,11 +17,13 @@ public class MoviesV3Controller : BaseV3Controller
 {
     private readonly IMovieRepository movieRepository;
     private readonly ILogger<MoviesV3Controller> logger;
+    private readonly IMapper mapper;    
 
-    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger)
+    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper)
     {
         this.movieRepository = movieRepository;
         this.logger = logger;
+        this.mapper = mapper;
     }
 
     [HttpPost]
@@ -26,7 +31,7 @@ public class MoviesV3Controller : BaseV3Controller
     {
         this.logger.LogInformation("Received request to get movies with RequestId: {RequestId}", request.RequestId);
         var movies = await this.movieRepository.GetAll();
-        var response = movies.Select(MovieResponse.FromEntity);
+        var response = this.mapper.Map<IEnumerable<MovieResponse>>(movies);
         this.logger.LogInformation("Retrieved {MoviesCount} movies", response.Count());
         return Ok(response, request.RequestId, "Movies got from Base" );
     }
@@ -43,7 +48,7 @@ public class MoviesV3Controller : BaseV3Controller
         else
         {
             this.logger.LogInformation("Retrieved movie with ID {MovieId}", id);
-            return Ok(MovieResponse.FromEntity(movie), request.RequestId, $"Movie with id {id} got from Base");
+            return Ok(this.mapper.Map<MovieResponse>(movie), request.RequestId, $"Movie with id {id} got from Base");
         }
     }   
     [HttpPut("{id:int}")]
@@ -59,10 +64,10 @@ public class MoviesV3Controller : BaseV3Controller
         }
         else
         {
-            request.Data?.ApplyTo(movie);
-            { this.logger.LogInformation("Movie with id {MovieId} found for update", id); }
+            this.mapper.Map(request.Data, movie);
+            this.logger.LogInformation("Movie with id {MovieId} found for update", id); 
             await this.movieRepository.Update(movie);
-            return Ok(MovieResponse.FromEntity(movie), request.RequestId, $"Movie with id {movie.Id} updated successfully. RequestId = {request.RequestId}");
+            return Ok(this.mapper.Map<MovieResponse>(movie), request.RequestId, $"Movie with id {movie.Id} updated successfully. RequestId = {request.RequestId}");
         }
             
 
@@ -72,7 +77,7 @@ public class MoviesV3Controller : BaseV3Controller
     public async Task<ActionResult<ApiResponse<MovieResponse>>> CreateMovie([FromBody] ApiRequest<MovieRequest> request)
     {
         this.logger.LogInformation("Received request to create movie with RequestId: {RequestId}", request.RequestId);
-        var movie = request.Data?.ToEntity();
+        var movie = this.mapper.Map<Movie>(request.Data);
         if (movie == null)
         {
             this.logger.LogWarning("Invalid movie data provided for creation. RequestId: {RequestId}", request.RequestId);
@@ -80,7 +85,7 @@ public class MoviesV3Controller : BaseV3Controller
         }
         await this.movieRepository.Create(movie);
         this.logger.LogInformation("Created new movie with ID {MovieId}. RequestId: {RequestId}", movie.Id, request.RequestId);
-        return Created(MovieResponse.FromEntity(movie), request.RequestId, $"Movie with id {movie.Id} created successfully. RequestId = {request.RequestId}");
+        return Created(this.mapper.Map<MovieResponse>(movie), request.RequestId, $"Movie with id {movie.Id} created successfully. RequestId = {request.RequestId}");
     }
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult<ApiResponse<object?>>> DeleteMovie(

@@ -6,6 +6,7 @@ using CineVault.API.Controllers.Responses;
 using CineVault.API.Data.Interfaces;
 using Mapster;
 using CineVault.API.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -16,11 +17,13 @@ public class ReviewsV3Controller : BaseV3Controller
 {
     private readonly IReviewRepository reviewRepository;
     private readonly ILogger<ReviewsV3Controller> logger;
+    private readonly CineVaultDbContext dbContext;
 
-    public ReviewsV3Controller(IReviewRepository reviewRepository, ILogger<ReviewsV3Controller> logger)
+    public ReviewsV3Controller(IReviewRepository reviewRepository, ILogger<ReviewsV3Controller> logger, CineVaultDbContext dbContext)
     {
         this.reviewRepository = reviewRepository;
         this.logger = logger;
+        this.dbContext = dbContext;
     }
 
     [HttpPost]
@@ -79,6 +82,14 @@ public class ReviewsV3Controller : BaseV3Controller
         {
             this.logger.LogWarning("Invalid review data provided for creation. RequestId: {RequestId}", request.RequestId);
             return BadRequest(ApiResponse<ReviewResponse>.Fail("Invalid review data", request.RequestId));
+        }
+        var existingreview = await dbContext.Reviews.FirstOrDefaultAsync(r => r.UserId == request.Data!.UserId && r.MovieId == request.Data!.MovieId);
+        if (existingreview is not null)
+        {
+            this.logger.LogWarning("User {UserId} has already reviewed movie {MovieId}. RequestId: {RequestId}", request.Data.UserId, request.Data.MovieId, request.RequestId);
+            existingreview.Adapt(review);
+            await this.reviewRepository.Update(existingreview);
+            return Ok(existingreview.Adapt<ReviewResponse>(), request.RequestId, $"Review with id {existingreview.Id} updated successfully. RequestId = {request.RequestId}");
         }
         await this.reviewRepository.Create(review);
         this.logger.LogInformation("Created new review with ID {ReviewId}. RequestId: {RequestId}", review.Id, request.RequestId);

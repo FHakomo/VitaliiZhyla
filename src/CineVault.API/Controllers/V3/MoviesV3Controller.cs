@@ -7,6 +7,7 @@ using CineVault.API.Data.Interfaces;
 using Mapster;
 using MapsterMapper;
 using CineVault.API.Data.Entities;
+using CineVault.API.Controllers.Services;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -18,12 +19,14 @@ public class MoviesV3Controller : BaseV3Controller
     private readonly IMovieRepository movieRepository;
     private readonly ILogger<MoviesV3Controller> logger;
     private readonly IMapper mapper;    
+    private readonly MovieService movieService;
 
-    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper)
+    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper, MovieService movieService)
     {
         this.movieRepository = movieRepository;
         this.logger = logger;
         this.mapper = mapper;
+        this.movieService = movieService;
     }
 
     [HttpPost]
@@ -99,6 +102,16 @@ public class MoviesV3Controller : BaseV3Controller
         }
         await movieRepository.Delete(movie);
         return Ok<object?>(null, request.RequestId, "Movie deleted successfully");
+    }
+    [HttpPost("bulk")]
+    public async Task<ActionResult<ApiResponse<List<MovieCreatedResponse>>>> CreateManyMovies([FromBody] ApiRequest<List<MovieRequest>> request)
+    {
+
+
+        this.logger.LogInformation("Request to create movies in bulk with RequestId: {RequestId}", request.RequestId);
+        var created = await movieService.BulkCreateMovies(request.Data);
+        return Created(created, request.RequestId, $"Bulk movie creation completed.RequestId: { request.RequestId}");
+
     }
 }
 

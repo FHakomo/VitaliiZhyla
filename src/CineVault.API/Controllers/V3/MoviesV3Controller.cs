@@ -8,6 +8,7 @@ using Mapster;
 using MapsterMapper;
 using CineVault.API.Data.Entities;
 using CineVault.API.Controllers.Services;
+using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 
 
 namespace CineVault.API.Controllers.V3;

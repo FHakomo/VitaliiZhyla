@@ -1,4 +1,4 @@
-﻿namespace CineVault.API.Controllers.Responses;
+﻿namespace CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 
 public class MovieCreatedResponse
 {

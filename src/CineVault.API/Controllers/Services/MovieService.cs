@@ -1,19 +1,19 @@
 ﻿using CineVault.API.Controllers.Requests;
-using CineVault.API.Controllers.Responses;
 using Mapster;
 using CineVault.API.Data.Entities;
 using CineVault.API.Data.Interfaces;
+using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 
 namespace CineVault.API.Controllers.Services;
 
 public class MovieService
 {
-    private readonly IMovieRepository movieRepository;
+    private readonly CineVaultDbContext dbContext;
     private readonly ILogger logger;
 
-    public MovieService(IMovieRepository movieRepository, ILogger logger)
+    public MovieService(ILogger logger, CineVaultDbContext dbContext)
     {
-        this.movieRepository = movieRepository;
+        this.dbContext = dbContext;
         this.logger = logger;
     }
     public async Task<List<MovieCreatedResponse>> BulkCreateMovies(List<MovieRequest> request)
@@ -26,7 +26,8 @@ public class MovieService
                 logger.LogWarning("Skipping movie creation due to missing title.");
                 continue;
             }
-            await this.movieRepository.Create(movie);
+            await dbContext.Movies.AddAsync(movie);
+            await dbContext.SaveChangesAsync();
             logger.LogInformation("Created movie with title: {Title}, ID: {MovieId}", movie.Title, movie.Id);
         }
         

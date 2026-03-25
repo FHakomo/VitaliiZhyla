@@ -54,6 +54,17 @@ public class MappingConfig : IRegister
         config.NewConfig<Movie, MovieCreatedResponse>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Title, src => src.Title);
-
+        // Конфігурація Comment
+            config.NewConfig<CommentRequest, Comment>()
+                .Map(dest => dest.Message, src => src.Message)
+                .Map(dest => dest.ReviewId, src => src.ReviewId)
+                .Map(dest => dest.UserId, src => src.UserId);
+            config.NewConfig<Comment, CommentResponse>()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.ReviewId, src => src.ReviewId)
+                .Map(dest => dest.UserId, src => src.UserId)
+                .Map(dest => dest.Username, src => src.User.Username)
+                .Map(dest => dest.Message, src => src.Message)
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt);
     }
 }

@@ -10,5 +10,6 @@ public sealed class Comment
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public Review? Review { get; set; }
     public User? User { get; set; }
-    
+    public ICollection<CommentLike> Likes { get; set; } = [];
+
 }

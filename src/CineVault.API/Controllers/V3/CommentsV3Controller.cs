@@ -92,4 +92,34 @@ public class CommentsV3Controller : BaseV3Controller
             return Ok<object?>(null!,($"Comment with id {id} deleted successfully. RequestId = {request.RequestId}"));
         }
     }
+    [HttpGet("comment/{commentId:int}/like")]
+    public async Task<ActionResult<ApiResponse<object?>>> LikeComment(int commentId, [FromQuery] int userId, [FromQuery] string requestId)
+    {
+        var comment = await this.dbContext.Comments.Include(c => c.Likes).FirstOrDefaultAsync(c => c.Id == commentId);
+        if (comment == null)
+        {
+            this.logger.LogWarning("Comment with id {CommentId} not found for like", commentId);
+            return NotFound(ApiResponse<object?>.Fail($"Comment with id {commentId} not found", requestId));
+        }
+        else
+        {
+            var existingLike = comment.Likes.FirstOrDefault(l => l.UserId == userId);
+            if (existingLike != null)
+            {
+
+                 this.logger.LogInformation("User with id {UserId} already liked comment with id {CommentId}", userId, commentId);
+                return Ok(new ApiResponse<object?> { Success = true, Message = "Comment already liked", RequestId = requestId});
+
+            }
+            else
+            {
+                var like = new CommentLike { UserId = userId, CommentId = commentId };
+                comment.Likes.Add(like);
+                await this.dbContext.CommentLikes.AddAsync(like);
+                await this.dbContext.SaveChangesAsync();
+                return Ok(new ApiResponse<object?> { Success = true, Message = "Comment successfully liked", RequestId = requestId });
+            }
+
+        }
+    }
 }

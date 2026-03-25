@@ -2,6 +2,7 @@
 using CineVault.API.Controllers.Requests;
 using CineVault.API.Data.Entities;
 using CineVault.API.Controllers.Responses;
+using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 namespace CineVault.API.Controllers.Mappings;
 
 public class MappingConfig : IRegister
@@ -49,6 +50,10 @@ public class MappingConfig : IRegister
             .Map(dest => dest.Rating, src => src.Rating)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.CreatedAt, src => src.CreatedAt);
+        //Конфігурації для нових DTO
+        config.NewConfig<Movie, MovieCreatedResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Title, src => src.Title);
 
     }
 }

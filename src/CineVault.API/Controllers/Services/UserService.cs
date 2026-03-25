@@ -2,6 +2,7 @@
 using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 using CineVault.API.Data.Entities;
 using CineVault.API.Data.Repositories;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace CineVault.API.Controllers.Services;
@@ -37,7 +38,7 @@ public class UserService
         logger.LogInformation("User search with {Filters}, total {Total}", request,total);
         return new PagedResult<UserResponse>
         {
-            Items = items.Select(UserResponse.FromEntity).ToList(),
+            Items = items.Adapt<List<UserResponse>>(),
             TotalCount = total,
             Page = request.Page,
             PageSize = request.PageSize ?? total

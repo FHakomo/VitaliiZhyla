@@ -8,16 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CineVault.API.Controllers.Services;
 
-public class MovieService
+public class MovieService : IMovieService
 {
     private readonly CineVaultDbContext dbContext;
-    private readonly ILogger logger;
+    private readonly ILogger<MovieService> logger;   // ← змінено
 
-    public MovieService(ILogger logger, CineVaultDbContext dbContext)
+    public MovieService(ILogger<MovieService> logger, CineVaultDbContext dbContext)   // ← змінено
     {
         this.dbContext = dbContext;
         this.logger = logger;
     }
+
     public async Task<List<MovieCreatedResponse>> BulkCreateMovies(List<MovieRequest> request)
     {
         var movies = request.Adapt<List<Movie>>();
@@ -32,13 +33,13 @@ public class MovieService
             await dbContext.SaveChangesAsync();
             logger.LogInformation("Created movie with title: {Title}, ID: {MovieId}", movie.Title, movie.Id);
         }
-        
+
         var response = movies.Adapt<List<MovieCreatedResponse>>();
         return response;
     }
-    public async Task<PagedResult<MovieResponse>> SearchAsync(MovieSearchRequest request)
-    {
 
+    public async Task<PagedResult<MovieResponse>> SearchMovieAsync(MovieSearchRequest request)
+    {
         var query = dbContext.Movies.AsQueryable();
         if (request.Title != null)
         {
@@ -61,19 +62,20 @@ public class MovieService
             query = query.Where(m => m.ReleaseDate.Value.Year <= request.YearTo);
         }
         if (request.MinRating.HasValue)
-            query = query.Where(m => m.Reviews.Average(r =>r.Rating) >= request.MinRating);
+            query = query.Where(m => m.Reviews.Average(r => r.Rating) >= request.MinRating);
 
         var total = await query.CountAsync();
         var items = await query.Skip((request.Page - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToListAsync();
         logger.LogInformation("Movie search with {Filters}, total {Total}", request, total);
         return new PagedResult<MovieResponse>
         {
-            Items =  items.Adapt<List<MovieResponse>>(),
+            Items = items.Adapt<List<MovieResponse>>(),
             TotalCount = total,
             Page = request.Page,
             PageSize = request.PageSize ?? total
         };
     }
+
     public async Task<List<object?>> BulkDeleteMovies(List<int> ids)
     {
         var movies = await dbContext.Movies.Where(m => ids.Contains(m.Id)).ToListAsync();

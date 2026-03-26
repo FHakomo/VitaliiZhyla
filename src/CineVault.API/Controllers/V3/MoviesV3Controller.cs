@@ -114,11 +114,12 @@ public class MoviesV3Controller : BaseV3Controller
         return Created(created, request.RequestId, $"Bulk movie creation completed.RequestId: {request.RequestId}");
 
     }
-    [HttpGet("filter")]
-    public async Task<ActionResult<ApiResponse<PagedResult<MovieResponse>>>> GetUsersWithFilter(ApiResponse<MovieSearchRequest> request)
+    [HttpPost("filter")]
+    public async Task<ActionResult<ApiResponse<PagedResult<MovieResponse>>>> GetMovieWithFilter(ApiRequest<MovieSearchRequest> request)
     {
-        var result = await movieService.SearchAsync(request.Data);
-        return Ok(result, request.RequestId, $"Users with filters got successfully. RequestId = {request.RequestId}");
+        this.logger.LogInformation("Received request to get movies with filters and RequestId: {RequestId}", request.RequestId);
+        var result = await movieService.SearchMovieAsync(request.Data);
+        return Ok(result, request.RequestId, $"Movies with filters got successfully. RequestId = {request.RequestId}");
     }
     [HttpDelete("bulk")]
     public async Task<ActionResult<ApiResponse<object?>>> DeleteManyMovies([FromBody] ApiRequest<List<int>> request)

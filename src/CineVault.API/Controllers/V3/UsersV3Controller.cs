@@ -101,7 +101,7 @@ public class UsersV3Controller : BaseV3Controller
         await userRepository.Delete(user);
         return Ok<object?>(null, request.RequestId, "User deleted successfully");
     }
-    [HttpGet("filter")]
+    [HttpPost("filter")]
     public async Task<ActionResult<ApiResponse<PagedResult<UserResponse>>>> GetUsersWithFilter(ApiResponse<UserSearchRequest> request)
     {
         var result = await userService.SearchAsync(request.Data);

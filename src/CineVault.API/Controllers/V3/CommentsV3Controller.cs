@@ -51,6 +51,7 @@ public class CommentsV3Controller : BaseV3Controller
             return Ok(this.mapper.Map<CommentResponse>(comment), request.RequestId, $"Comment with id {id} got from Base");
         }
     }
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<ApiResponse<CommentResponse>>> UpdateComment(int id, [FromBody] ApiRequest<CommentRequest> request)
     {
         var comment = await this.dbContext.Comments.Include(c => c.User).Include(c => c.Review).FirstOrDefaultAsync(c => c.Id == id);
@@ -68,6 +69,7 @@ public class CommentsV3Controller : BaseV3Controller
             return Ok(this.mapper.Map<CommentResponse>(comment), request.RequestId, $"Comment with id {comment.Id} updated successfully. RequestId = {request.RequestId}");
         }
     }
+    [HttpPost]
     public async Task<ActionResult<ApiResponse<CommentResponse>>> CreateComment([FromBody] ApiRequest<CommentRequest> request)
     {
         this.logger.LogInformation("Received request to create comment with RequestId: {RequestId}", request.RequestId);
@@ -76,6 +78,7 @@ public class CommentsV3Controller : BaseV3Controller
         await this.dbContext.SaveChangesAsync();
         return Ok(this.mapper.Map<CommentResponse>(comment), request.RequestId, $"Comment with id {comment.Id} created successfully. RequestId = {request.RequestId}");
     }
+    [HttpPost("{id:int}/delete")]
     public async Task<ActionResult<ApiResponse<object?>>> DeleteComment(int id, [FromBody] ApiRequest<object?> request)
     {
         var comment = await this.dbContext.Comments.FirstOrDefaultAsync(c => c.Id == id);
@@ -92,7 +95,7 @@ public class CommentsV3Controller : BaseV3Controller
             return Ok<object?>(null!,($"Comment with id {id} deleted successfully. RequestId = {request.RequestId}"));
         }
     }
-    [HttpGet("comment/{commentId:int}/like")]
+    [HttpPost("comment/{commentId:int}/like")]
     public async Task<ActionResult<ApiResponse<object?>>> LikeComment(int commentId, [FromQuery] int userId, [FromQuery] string requestId)
     {
         var comment = await this.dbContext.Comments.Include(c => c.Likes).FirstOrDefaultAsync(c => c.Id == commentId);

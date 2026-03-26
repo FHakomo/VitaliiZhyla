@@ -87,7 +87,7 @@ public class ReviewsV3Controller : BaseV3Controller
         if (existingreview is not null)
         {
             this.logger.LogWarning("User {UserId} has already reviewed movie {MovieId}. RequestId: {RequestId}", request.Data.UserId, request.Data.MovieId, request.RequestId);
-            existingreview.Adapt(review);
+            request.Data.Adapt(existingreview);
             await this.reviewRepository.Update(existingreview);
             return Ok(existingreview.Adapt<ReviewResponse>(), request.RequestId, $"Review with id {existingreview.Id} updated successfully. RequestId = {request.RequestId}");
         }

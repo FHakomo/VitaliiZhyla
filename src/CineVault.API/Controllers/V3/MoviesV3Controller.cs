@@ -7,6 +7,8 @@ using CineVault.API.Data.Interfaces;
 using Mapster;
 using MapsterMapper;
 using CineVault.API.Data.Entities;
+using CineVault.API.Controllers.Services;
+using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -17,13 +19,15 @@ public class MoviesV3Controller : BaseV3Controller
 {
     private readonly IMovieRepository movieRepository;
     private readonly ILogger<MoviesV3Controller> logger;
-    private readonly IMapper mapper;    
+    private readonly IMapper mapper;
+    private readonly MovieService movieService;
 
-    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper)
+    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper, MovieService movieService)
     {
         this.movieRepository = movieRepository;
         this.logger = logger;
         this.mapper = mapper;
+        this.movieService = movieService;
     }
 
     [HttpPost]
@@ -33,7 +37,7 @@ public class MoviesV3Controller : BaseV3Controller
         var movies = await this.movieRepository.GetAll();
         var response = this.mapper.Map<IEnumerable<MovieResponse>>(movies);
         this.logger.LogInformation("Retrieved {MoviesCount} movies", response.Count());
-        return Ok(response, request.RequestId, "Movies got from Base" );
+        return Ok(response, request.RequestId, "Movies got from Base");
     }
     [HttpPost("{id:int}")]
     public async Task<ActionResult<ApiResponse<MovieResponse>>> GetMovieById(int id, [FromBody] ApiRequest request)
@@ -50,7 +54,7 @@ public class MoviesV3Controller : BaseV3Controller
             this.logger.LogInformation("Retrieved movie with ID {MovieId}", id);
             return Ok(this.mapper.Map<MovieResponse>(movie), request.RequestId, $"Movie with id {id} got from Base");
         }
-    }   
+    }
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ApiResponse<MovieResponse>>> UpdateMovie(int id, [FromBody] ApiRequest<MovieRequest> request)
     {
@@ -65,11 +69,11 @@ public class MoviesV3Controller : BaseV3Controller
         else
         {
             this.mapper.Map(request.Data, movie);
-            this.logger.LogInformation("Movie with id {MovieId} found for update", id); 
+            this.logger.LogInformation("Movie with id {MovieId} found for update", id);
             await this.movieRepository.Update(movie);
             return Ok(this.mapper.Map<MovieResponse>(movie), request.RequestId, $"Movie with id {movie.Id} updated successfully. RequestId = {request.RequestId}");
         }
-            
+
 
     }
 
@@ -99,6 +103,30 @@ public class MoviesV3Controller : BaseV3Controller
         }
         await movieRepository.Delete(movie);
         return Ok<object?>(null, request.RequestId, "Movie deleted successfully");
+    }
+    [HttpPost("bulk")]
+    public async Task<ActionResult<ApiResponse<List<MovieCreatedResponse>>>> CreateManyMovies([FromBody] ApiRequest<List<MovieRequest>> request)
+    {
+
+
+        this.logger.LogInformation("Request to create movies in bulk with RequestId: {RequestId}", request.RequestId);
+        var created = await movieService.BulkCreateMovies(request.Data);
+        return Created(created, request.RequestId, $"Bulk movie creation completed.RequestId: {request.RequestId}");
+
+    }
+    [HttpPost("filter")]
+    public async Task<ActionResult<ApiResponse<PagedResult<MovieResponse>>>> GetMovieWithFilter(ApiRequest<MovieSearchRequest> request)
+    {
+        this.logger.LogInformation("Received request to get movies with filters and RequestId: {RequestId}", request.RequestId);
+        var result = await movieService.SearchMovieAsync(request.Data);
+        return Ok(result, request.RequestId, $"Movies with filters got successfully. RequestId = {request.RequestId}");
+    }
+    [HttpDelete("bulk")]
+    public async Task<ActionResult<ApiResponse<object?>>> DeleteManyMovies([FromBody] ApiRequest<List<int>> request)
+    {
+        this.logger.LogInformation("Request to delete movies in bulk with RequestId: {RequestId}", request.RequestId);
+        await movieService.BulkDeleteMovies(request.Data);
+        return Ok<object?>(null, request.RequestId, $"Bulk movie deletion completed.RequestId: {request.RequestId}");
     }
 }
 

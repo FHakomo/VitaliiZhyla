@@ -6,6 +6,8 @@ using CineVault.API.Controllers.Responses;
 using CineVault.API.Data.Interfaces;
 using CineVault.API.Data.Entities;
 using Mapster;
+using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
+using CineVault.API.Controllers.Services;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -16,11 +18,13 @@ public class UsersV3Controller : BaseV3Controller
 {
     private readonly IUserRepository userRepository;
     private readonly ILogger<UsersV3Controller> logger;
+    private readonly UserService userService;
 
-    public UsersV3Controller(IUserRepository userRepository, ILogger<UsersV3Controller> logger)
+    public UsersV3Controller(IUserRepository userRepository, ILogger<UsersV3Controller> logger, UserService userService)
     {
         this.userRepository = userRepository;
         this.logger = logger;
+        this.userService = userService;
     }
 
     [HttpPost]
@@ -96,6 +100,12 @@ public class UsersV3Controller : BaseV3Controller
         }
         await userRepository.Delete(user);
         return Ok<object?>(null, request.RequestId, "User deleted successfully");
+    }
+    [HttpPost("filter")]
+    public async Task<ActionResult<ApiResponse<PagedResult<UserResponse>>>> GetUsersWithFilter(ApiResponse<UserSearchRequest> request)
+    {
+        var result = await userService.SearchAsync(request.Data);
+        return Ok(result, request.RequestId, $"Users with filters got successfully. RequestId = {request.RequestId}");
     }
 }
 

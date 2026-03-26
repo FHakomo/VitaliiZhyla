@@ -1,8 +1,11 @@
 using CineVault.API;
+using CineVault.API.Controllers.Services;
 using CineVault.API.Extensions;
+using CineVault.API.Data.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+
 [assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,7 @@ builder.AddLogging();
 builder.Services.AddCineVaultDbContext(builder.Configuration);
 builder.Services.AddControllers();
 
+
 builder.Services.AddRepositories();
 builder.Services.AddApiVersioningWithApiExplorer();
 builder.Services.AddSwaggerWithOptions();
@@ -22,6 +26,10 @@ builder.Services.AddSwaggerWithOptions();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMapstter();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<UserService>();
 
 
 var app = builder.Build();

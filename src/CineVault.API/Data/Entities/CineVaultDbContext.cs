@@ -7,6 +7,8 @@ public sealed class CineVaultDbContext : DbContext
     public required DbSet<Movie> Movies { get; set; }
     public required DbSet<Review> Reviews { get; set; }
     public required DbSet<User> Users { get; set; }
+    public required DbSet<Comment> Comments { get; set; }
+    public required DbSet<CommentLike> CommentLikes { get; set; }
 
     public CineVaultDbContext(DbContextOptions<CineVaultDbContext> options)
         : base(options)

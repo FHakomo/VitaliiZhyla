@@ -92,6 +92,9 @@ public class ReviewsV3Controller : BaseV3Controller
             return Ok(existingreview.Adapt<ReviewResponse>(), request.RequestId, $"Review with id {existingreview.Id} updated successfully. RequestId = {request.RequestId}");
         }
         await this.reviewRepository.Create(review);
+        Movie? movie = await dbContext.Movies.FirstOrDefaultAsync(m => m.Id == review.MovieId);
+        movie!.Reviews.Add(review);
+        dbContext.Movies.Update(movie);
         this.logger.LogInformation("Created new review with ID {ReviewId}. RequestId: {RequestId}", review.Id, request.RequestId);
         return Ok(review.Adapt<ReviewResponse>(), request.RequestId, $"Review with id {review.Id} created successfully. RequestId = {request.RequestId}");
     }

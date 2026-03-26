@@ -74,4 +74,26 @@ public class MovieService
             PageSize = request.PageSize ?? total
         };
     }
+    public async Task<List<object?>> BulkDeleteMovies(List<int> ids)
+    {
+        var movies = await dbContext.Movies.Where(m => ids.Contains(m.Id)).ToListAsync();
+        if (movies.Count == 0)
+        {
+            logger.LogWarning("No movies found for bulk deletion with IDs: {Ids}", string.Join(", ", ids));
+            return new List<object?>();
+        }
+        foreach (Movie movie in movies)
+        {
+            if (movie.Reviews.Any())
+            {
+                logger.LogWarning("Skipping deletion of movie with ID: {MovieId} due to existing reviews.", movie.Id);
+                continue;
+            }
+            dbContext.Movies.Remove(movie);
+            logger.LogInformation("Deleted movie with ID: {MovieId}", movie.Id);
+        }
+        await dbContext.SaveChangesAsync();
+        logger.LogInformation("Deleted movies with IDs: {Ids}", string.Join(", ", movies.Select(m => m.Id)));
+        return movies.Select(m => (object?)null).ToList();
+    }
 }

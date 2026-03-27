@@ -29,11 +29,13 @@ public class MappingConfig : IRegister
         config.NewConfig<User, UserResponse>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Username, src => src.Username)
-            .Map(dest => dest.Email, src => src.Email);
+            .Map(dest => dest.Email, src => src.Email)
+            .Map(dest => dest.AvatarUrl, src => src.AvatarUrl);
         config.NewConfig<UserRequest, User>()
             .Map(dest => dest.Username, src => src.Username)
             .Map(dest => dest.Email, src => src.Email)
-            .Map(dest => dest.Password, src => src.Password);
+            .Map(dest => dest.Password, src => src.Password)
+            .Map(dest => dest.AvatarUrl, src => src.AvatarUrl);
 
         config.NewConfig<ReviewRequest, Review>()
             .Map(dest => dest.Rating, src => src.Rating)

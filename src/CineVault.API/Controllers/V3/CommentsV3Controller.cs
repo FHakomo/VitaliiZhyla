@@ -30,7 +30,7 @@ public class CommentsV3Controller : BaseV3Controller
     public async Task<ActionResult<ApiResponse<IEnumerable<CommentResponse>>>> GetComments([FromBody] ApiRequest request)
     {
         this.logger.LogInformation("Received request to get movies with RequestId: {RequestId}", request.RequestId);
-        var comments = await this.dbContext.Comments.Include(c => c.User).Include(c => c.Review).ToListAsync();
+        var comments = await this.dbContext.Comments.Include(c => c.User).Include(c => c.Review).AsNoTracking().ToListAsync();
         var response = this.mapper.Map<IEnumerable<CommentResponse>>(comments);
         this.logger.LogInformation("Retrieved {CommenCount} movies", response.Count());
         return Ok(response, request.RequestId, "Movies got from Base");
@@ -39,7 +39,7 @@ public class CommentsV3Controller : BaseV3Controller
     public async Task<ActionResult<ApiResponse<CommentResponse>>> GetCommentById(int id, [FromBody] ApiRequest request)
     {
         this.logger.LogInformation("Received request to get comment with ID {CommentId} and RequestId: {RequestId}", id, request.RequestId);
-        var comment = await this.dbContext.Comments.Include(c =>c.User).Include(c => c.Review).FirstOrDefaultAsync(c => c.Id == id);
+        var comment = await this.dbContext.Comments.Include(c => c.User).Include(c => c.Review).AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
         if (comment == null)
         {
             this.logger.LogWarning("Comment with id {CommentId} not found", id);

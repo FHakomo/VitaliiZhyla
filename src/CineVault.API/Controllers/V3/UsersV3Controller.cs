@@ -87,6 +87,16 @@ public class UsersV3Controller : BaseV3Controller
             this.logger.LogWarning("Invalid user data provided for creation. RequestId: {RequestId}", request.RequestId);
             return BadRequest(ApiResponse<UserResponse>.Fail("Invalid user data", request.RequestId));
         }
+        if ( await this.dbContext.Users.AnyAsync(user => user.Email == request.Data.Email))
+        {
+            this.logger.LogWarning("User with email {Email} already exists. RequestId: {RequestId}", user.Email, request.RequestId);
+            return Conflict(ApiResponse<UserResponse>.Fail($"User with email {user.Email} already exists", request.RequestId));
+        }
+        if (await this.dbContext.Users.AnyAsync(user => user.Username == request.Data.Username))
+        {
+            this.logger.LogWarning("User with username {Username} already exists. RequestId: {RequestId}", user.Username, request.RequestId);
+            return Conflict(ApiResponse<UserResponse>.Fail($"User with username {user.Username} already exists", request.RequestId));
+        }
         await this.userRepository.Create(user);
         this.logger.LogInformation("Created new user with ID {UserId}. RequestId: {RequestId}", user.Id, request.RequestId);
         return Ok(user.Adapt<UserResponse>(), request.RequestId, $"User with id {user.Id} created successfully. RequestId = {request.RequestId}");

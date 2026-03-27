@@ -24,10 +24,14 @@ public class ActorsV3Controller : BaseV3Controller
         this.logger = logger;
         this.mapper = mapper;
     }
+    private static readonly Func<CineVaultDbContext, int, Task<Actor?>> GeActorByIdCompiled =
+    EF.CompileAsyncQuery((CineVaultDbContext ctx, int id) =>
+        ctx.Actors.AsNoTracking()
+            .FirstOrDefault(m => m.Id == id));
     public async Task<ActionResult<ApiResponse<IEnumerable<ActorResponse>>>> GetActors([FromBody] ApiRequest request)
     {
         this.logger.LogInformation("Received request to get actors with RequestId: {RequestId}", request.RequestId);
-        var comments = await this.dbContext.Actors.ToListAsync();
+        var comments = await this.dbContext.Actors.AsNoTracking().ToListAsync();
         var response = this.mapper.Map<IEnumerable<ActorResponse>>(comments);
         this.logger.LogInformation("Retrieved {ActorCount} movies", response.Count());
         return Ok(response, request.RequestId, "Movies got from Base");
@@ -36,7 +40,7 @@ public class ActorsV3Controller : BaseV3Controller
     public async Task<ActionResult<ApiResponse<ActorResponse>>> GetActorById(int id, [FromBody] ApiRequest request)
     {
         this.logger.LogInformation("Received request to get actor with ID {Actor} and RequestId: {RequestId}", id, request.RequestId);
-        var actor = await this.dbContext.Actors.FirstOrDefaultAsync(c => c.Id == id);
+        var actor = await GeActorByIdCompiled(this.dbContext, id);
         if (actor == null)
         {
             this.logger.LogWarning("Actor with id {CommentId} not found", id);

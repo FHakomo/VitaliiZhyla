@@ -48,7 +48,7 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateUser(UserRequest request)
     {
-        var user = request.ToEntity();
+        var user = request.ToEntity(); 
 
         await this.userRepository.Create(user);
 

@@ -9,6 +9,7 @@ public sealed class MovieRequest
     public DateOnly? ReleaseDate { get; init; }
     public string? Genre { get; init; }
     public string? Director { get; init; }
+    public string? PosterUrl { get; init; }
 
     public Movie ToEntity()
     {

@@ -9,6 +9,7 @@ using MapsterMapper;
 using CineVault.API.Data.Entities;
 using CineVault.API.Controllers.Services;
 using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -21,13 +22,15 @@ public class MoviesV3Controller : BaseV3Controller
     private readonly ILogger<MoviesV3Controller> logger;
     private readonly IMapper mapper;
     private readonly MovieService movieService;
+    private readonly CineVaultDbContext dbContext;
 
-    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper, MovieService movieService)
+    public MoviesV3Controller(IMovieRepository movieRepository, ILogger<MoviesV3Controller> logger, IMapper mapper, MovieService movieService, CineVaultDbContext dbContext)
     {
         this.movieRepository = movieRepository;
         this.logger = logger;
         this.mapper = mapper;
         this.movieService = movieService;
+        this.dbContext = dbContext;
     }
 
     [HttpPost]
@@ -101,7 +104,8 @@ public class MoviesV3Controller : BaseV3Controller
         {
             return NotFound(ApiResponse<object?>.Fail(request.RequestId, $"Movie with id {id} not found"));
         }
-        await movieRepository.Delete(movie);
+        movie.IsDeleted = true;
+        await movieRepository.Update(movie);
         return Ok<object?>(null, request.RequestId, "Movie deleted successfully");
     }
     [HttpPost("bulk")]
@@ -127,6 +131,48 @@ public class MoviesV3Controller : BaseV3Controller
         this.logger.LogInformation("Request to delete movies in bulk with RequestId: {RequestId}", request.RequestId);
         await movieService.BulkDeleteMovies(request.Data);
         return Ok<object?>(null, request.RequestId, $"Bulk movie deletion completed.RequestId: {request.RequestId}");
+    }
+    [HttpPost("withdetails/{id:int}")]
+    public async Task<ActionResult<ApiResponse<MovieWithDetailsResponse>>> GetMovieWithDetails(int id, [FromBody] ApiRequest request)
+    {
+        this.logger.LogInformation("Received request to get movie with details for ID {MovieId} and RequestId: {RequestId}", id, request.RequestId);
+        var movie = await this.dbContext.Movies
+            .Where(m => m.Id == id)
+            .Select(m => new MovieWithDetailsResponse
+            {
+                Title = m.Title,
+                Description = m.Description,
+                ReleaseDate = m.ReleaseDate,
+                Genre = m.Genre,
+                Director = m.Director,
+                Actors = m.MovieActors.Select(ma => ma.Actor.FullName).ToList(),
+                AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0,
+                ReviewCount = m.Reviews.Count(),
+                Reviews = m.Reviews.Select(r => new ReviewResponse
+                {
+                    Id = r.Id,
+                    Comment = r.Comment,
+                    Rating = r.Rating,
+                    Username = r.User.Username,
+                    UserId = r.UserId,
+                    MovieId = r.MovieId,
+                    MovieTitle = r.Movie.Title,
+                    CreatedAt = r.CreatedAt,
+                }).OrderByDescending(r => r.CreatedAt)
+                .Take(5)
+                .ToList()
+            })
+            .FirstOrDefaultAsync();
+        if (movie == null)
+        {
+            this.logger.LogWarning("Movie with id {MovieId} not found for details", id);
+            return NotFound(ApiResponse<MovieWithDetailsResponse>.Fail($"Movie with id {id} not found", request.RequestId));
+        }
+        else
+        {
+            this.logger.LogInformation("Retrieved movie with details for ID {MovieId}", id);
+            return Ok(movie, request.RequestId, $"Movie with id {id} with details got successfully. RequestId = {request.RequestId}");
+        }
     }
 }
 

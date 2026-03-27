@@ -91,7 +91,7 @@ public class MovieService : IMovieService
                 logger.LogWarning("Skipping deletion of movie with ID: {MovieId} due to existing reviews.", movie.Id);
                 continue;
             }
-            dbContext.Movies.Remove(movie);
+            movie.IsDeleted = true;
             logger.LogInformation("Deleted movie with ID: {MovieId}", movie.Id);
         }
         await dbContext.SaveChangesAsync();

@@ -25,8 +25,12 @@ public static class ServiceCollectionExtensions
             {
                 throw new InvalidOperationException("Connection string is not configured");
             }
-
-            options.UseInMemoryDatabase(connectionString);
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(3);
+            });
+            options.EnableSensitiveDataLogging();
+            options.EnableDetailedErrors();
         });
 
         return services;

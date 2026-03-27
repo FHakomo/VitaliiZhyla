@@ -11,4 +11,6 @@ public sealed class Review
     public Movie? Movie { get; set; }
     public User? User { get; set; }
     public ICollection<Comment> Comments { get; set; } = [];
+    public bool IsDeleted { get; set; } = false;
+
 }

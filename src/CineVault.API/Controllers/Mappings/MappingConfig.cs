@@ -15,7 +15,8 @@ public class MappingConfig : IRegister
             .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.ReleaseDate, src => src.ReleaseDate)
             .Map(dest => dest.Genre, src => src.Genre)
-            .Map(dest => dest.Director, src => src.Director);
+            .Map(dest => dest.Director, src => src.Director)
+            .Map(dest => dest.PosterUrl, src => src.PosterUrl);
         config.NewConfig<Movie, MovieResponse>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Title, src => src.Title)
@@ -24,16 +25,19 @@ public class MappingConfig : IRegister
             .Map(dest => dest.Genre, src => src.Genre)
             .Map(dest => dest.Director, src => src.Director)
             .Map(dest => dest.AverageRating, src => src.Reviews.Count != 0 ? src.Reviews.Average(r => r.Rating) : 0)
-            .Map(dest => dest.ReviewCount, src => src.Reviews.Count);
+            .Map(dest => dest.ReviewCount, src => src.Reviews.Count)
+            .Map(dest => dest.PosterUrl, src => src.PosterUrl);
         // Конфігурація для User
         config.NewConfig<User, UserResponse>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Username, src => src.Username)
-            .Map(dest => dest.Email, src => src.Email);
+            .Map(dest => dest.Email, src => src.Email)
+            .Map(dest => dest.AvatarUrl, src => src.AvatarUrl);
         config.NewConfig<UserRequest, User>()
             .Map(dest => dest.Username, src => src.Username)
             .Map(dest => dest.Email, src => src.Email)
-            .Map(dest => dest.Password, src => src.Password);
+            .Map(dest => dest.Password, src => src.Password)
+            .Map(dest => dest.AvatarUrl, src => src.AvatarUrl);
 
         config.NewConfig<ReviewRequest, Review>()
             .Map(dest => dest.Rating, src => src.Rating)
@@ -66,5 +70,15 @@ public class MappingConfig : IRegister
                 .Map(dest => dest.Username, src => src.User.Username)
                 .Map(dest => dest.Message, src => src.Message)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt);
+        //Конфігурація для Actor
+        config.NewConfig<ActorRequest, Actor>()
+            .Map(dest => dest.FullName, src => src.FullName)
+            .Map(dest => dest.BirthDate, src => src.BirthDate)
+            .Map(dest => dest.Biography, src => src.Biography);
+        config.NewConfig<Actor, ActorResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.FullName, src => src.FullName)
+            .Map(dest => dest.BirthDate, src => src.BirthDate)
+            .Map(dest => dest.Biography, src => src.Biography);
     }
 }

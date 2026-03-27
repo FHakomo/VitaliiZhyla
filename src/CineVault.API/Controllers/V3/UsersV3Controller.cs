@@ -8,6 +8,7 @@ using CineVault.API.Data.Entities;
 using Mapster;
 using CineVault.API.Controllers.Responses.MethodsExclusiveResponses;
 using CineVault.API.Controllers.Services;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CineVault.API.Controllers.V3;
@@ -19,12 +20,14 @@ public class UsersV3Controller : BaseV3Controller
     private readonly IUserRepository userRepository;
     private readonly ILogger<UsersV3Controller> logger;
     private readonly UserService userService;
+    private readonly CineVaultDbContext dbContext;
 
-    public UsersV3Controller(IUserRepository userRepository, ILogger<UsersV3Controller> logger, UserService userService)
+    public UsersV3Controller(IUserRepository userRepository, ILogger<UsersV3Controller> logger, UserService userService, CineVaultDbContext dbContext)
     {
         this.userRepository = userRepository;
         this.logger = logger;
         this.userService = userService;
+        this.dbContext = dbContext;
     }
 
     [HttpPost]
@@ -84,6 +87,16 @@ public class UsersV3Controller : BaseV3Controller
             this.logger.LogWarning("Invalid user data provided for creation. RequestId: {RequestId}", request.RequestId);
             return BadRequest(ApiResponse<UserResponse>.Fail("Invalid user data", request.RequestId));
         }
+        if ( await this.dbContext.Users.AnyAsync(user => user.Email == request.Data.Email))
+        {
+            this.logger.LogWarning("User with email {Email} already exists. RequestId: {RequestId}", user.Email, request.RequestId);
+            return Conflict(ApiResponse<UserResponse>.Fail($"User with email {user.Email} already exists", request.RequestId));
+        }
+        if (await this.dbContext.Users.AnyAsync(user => user.Username == request.Data.Username))
+        {
+            this.logger.LogWarning("User with username {Username} already exists. RequestId: {RequestId}", user.Username, request.RequestId);
+            return Conflict(ApiResponse<UserResponse>.Fail($"User with username {user.Username} already exists", request.RequestId));
+        }
         await this.userRepository.Create(user);
         this.logger.LogInformation("Created new user with ID {UserId}. RequestId: {RequestId}", user.Id, request.RequestId);
         return Ok(user.Adapt<UserResponse>(), request.RequestId, $"User with id {user.Id} created successfully. RequestId = {request.RequestId}");
@@ -98,7 +111,8 @@ public class UsersV3Controller : BaseV3Controller
         {
             return NotFound(ApiResponse<object?>.Fail(request.RequestId, $"User with id {id} not found"));
         }
-        await userRepository.Delete(user);
+        user.IsDeleted = true;
+        await userRepository.Update(user);
         return Ok<object?>(null, request.RequestId, "User deleted successfully");
     }
     [HttpPost("filter")]
@@ -106,6 +120,42 @@ public class UsersV3Controller : BaseV3Controller
     {
         var result = await userService.SearchAsync(request.Data);
         return Ok(result, request.RequestId, $"Users with filters got successfully. RequestId = {request.RequestId}");
+    }
+    [HttpPost("statistics/{id:int}")]
+    public async Task<ActionResult<ApiResponse<UserStatisticsResponse>>> GetUserStatistics(int id, ApiResponse<object?> request)
+    {
+        var user = await userRepository.GetById(id);
+        if (user is null)
+        {
+            return NotFound(ApiResponse<UserStatisticsResponse>.Fail(request.RequestId, $"User with id {id} not found"));
+        }
+        var statistic = await this.dbContext.Users.Where(u => u.Id == id)
+            .Select(u => new UserStatisticsResponse
+            {
+                Username = u.Username,
+                TotalReviews = u.Reviews.Count,
+                AverageRating = u.Reviews.Count > 0 ? u.Reviews.Average(r => r.Rating) : 0,
+                LastActivity = u.Reviews
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Select(r => r.CreatedAt)
+                    .FirstOrDefault(),
+                GenreStats = u.Reviews
+                    .Where(r => r.Movie != null && r.Movie.Genre != null)
+                    .GroupBy(r => r.Movie!.Genre!)
+                    .Select(g => new GenreList
+                    {
+                        Genre = g.Key,
+                        ReviewCount = g.Count(),
+                        AverageRating = Math.Round(g.Average(r => (double)r.Rating), 2)
+                    })
+                    .OrderByDescending(g => g.ReviewCount)
+                    .ToList()
+            })
+            .FirstOrDefaultAsync();
+
+
+    
+        return Ok(statistic, request.RequestId, $"User statistics got successfully. RequestId = {request.RequestId}");
     }
 }
 

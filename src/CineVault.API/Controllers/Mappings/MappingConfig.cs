@@ -15,7 +15,8 @@ public class MappingConfig : IRegister
             .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.ReleaseDate, src => src.ReleaseDate)
             .Map(dest => dest.Genre, src => src.Genre)
-            .Map(dest => dest.Director, src => src.Director);
+            .Map(dest => dest.Director, src => src.Director)
+            .Map(dest => dest.PosterUrl, src => src.PosterUrl);
         config.NewConfig<Movie, MovieResponse>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Title, src => src.Title)
@@ -24,7 +25,8 @@ public class MappingConfig : IRegister
             .Map(dest => dest.Genre, src => src.Genre)
             .Map(dest => dest.Director, src => src.Director)
             .Map(dest => dest.AverageRating, src => src.Reviews.Count != 0 ? src.Reviews.Average(r => r.Rating) : 0)
-            .Map(dest => dest.ReviewCount, src => src.Reviews.Count);
+            .Map(dest => dest.ReviewCount, src => src.Reviews.Count)
+            .Map(dest => dest.PosterUrl, src => src.PosterUrl);
         // Конфігурація для User
         config.NewConfig<User, UserResponse>()
             .Map(dest => dest.Id, src => src.Id)

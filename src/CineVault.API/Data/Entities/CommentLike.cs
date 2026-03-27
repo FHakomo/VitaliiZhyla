@@ -7,5 +7,6 @@ public sealed class CommentLike
     public required int UserId { get; set; }
     public Comment? Comment { get; set; }
     public User? User { get; set; }
+    public DateTime LikedAt { get; set; } = DateTime.UtcNow;
 
 }

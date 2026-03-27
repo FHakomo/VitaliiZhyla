@@ -9,4 +9,5 @@ public sealed class Movie
     public string? Genre { get; set; }
     public string? Director { get; set; }
     public ICollection<Review> Reviews { get; set; } = [];
+    public string? PosterUrl { get; set; }
 }

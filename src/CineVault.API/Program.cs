@@ -5,6 +5,7 @@ using CineVault.API.Data.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using CineVault.API.Data.Entities;
 
 [assembly: ApiController]
 
@@ -49,7 +50,11 @@ if (app.Environment.IsLocal())
 {
     app.UseDeveloperExceptionPage();
 }
-
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CineVaultDbContext>();
+    await dbContext.Database.EnsureCreatedAsync();
+}
 app.UseHttpsRedirection();
 app.UseMiddleware<PerformanceLoggingMiddleware>();
 app.MapControllers();

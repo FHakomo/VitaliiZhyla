@@ -6,6 +6,7 @@ using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using CineVault.API.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 [assembly: ApiController]
 

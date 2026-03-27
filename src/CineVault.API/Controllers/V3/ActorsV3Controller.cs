@@ -28,6 +28,7 @@ public class ActorsV3Controller : BaseV3Controller
     EF.CompileAsyncQuery((CineVaultDbContext ctx, int id) =>
         ctx.Actors.AsNoTracking()
             .FirstOrDefault(m => m.Id == id));
+    [HttpPost]
     public async Task<ActionResult<ApiResponse<IEnumerable<ActorResponse>>>> GetActors([FromBody] ApiRequest request)
     {
         this.logger.LogInformation("Received request to get actors with RequestId: {RequestId}", request.RequestId);
@@ -70,7 +71,7 @@ public class ActorsV3Controller : BaseV3Controller
             return Ok(this.mapper.Map<ActorResponse>(actor), request.RequestId, $"Actor with id {actor.Id} updated successfully. RequestId = {request.RequestId}");
         }
     }
-    [HttpPost]
+    [HttpPost("Create")]
     public async Task<ActionResult<ApiResponse<ActorResponse>>> CreateComment([FromBody] ApiRequest<ActorRequest> request)
     {
         this.logger.LogInformation("Received request to create actor with RequestId: {RequestId}", request.RequestId);

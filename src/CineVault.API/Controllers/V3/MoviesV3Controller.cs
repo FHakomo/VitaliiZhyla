@@ -132,7 +132,7 @@ public class MoviesV3Controller : BaseV3Controller
         await movieService.BulkDeleteMovies(request.Data);
         return Ok<object?>(null, request.RequestId, $"Bulk movie deletion completed.RequestId: {request.RequestId}");
     }
-    [HttpPost("withdetails/{/id:int}")]
+    [HttpPost("withdetails/{id:int}")]
     public async Task<ActionResult<ApiResponse<MovieWithDetailsResponse>>> GetMovieWithDetails(int id, [FromBody] ApiRequest request)
     {
         this.logger.LogInformation("Received request to get movie with details for ID {MovieId} and RequestId: {RequestId}", id, request.RequestId);

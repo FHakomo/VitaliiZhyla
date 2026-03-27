@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CineVault.API.Migrations
 {
     [DbContext(typeof(CineVaultDbContext))]
-    [Migration("20260327131620_InitialCreate")]
+    [Migration("20260327145024_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -175,9 +175,9 @@ namespace CineVault.API.Migrations
                         .IsRequired();
 
                     b.HasOne("CineVault.API.Data.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Review");
@@ -194,9 +194,9 @@ namespace CineVault.API.Migrations
                         .IsRequired();
 
                     b.HasOne("CineVault.API.Data.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("CommentLikes")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Comment");
@@ -240,6 +240,10 @@ namespace CineVault.API.Migrations
 
             modelBuilder.Entity("CineVault.API.Data.Entities.User", b =>
                 {
+                    b.Navigation("CommentLikes");
+
+                    b.Navigation("Comments");
+
                     b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618

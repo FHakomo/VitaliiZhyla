@@ -7,4 +7,5 @@ public sealed class Actor
     public DateOnly? BirthDate { get; set; }
     public string? Biography { get; set; }
     public ICollection<MovieActor> MovieActors { get; set; } = [];
+    public bool IsDeleted { get; set; } = false;
 }

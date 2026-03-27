@@ -108,7 +108,8 @@ public class ReviewsV3Controller : BaseV3Controller
         {
             return NotFound(ApiResponse<object?>.Fail(request.RequestId, $"Review with id {id} not found"));
         }
-        await reviewRepository.Delete(review);
+        review.IsDeleted = true;
+        await reviewRepository.Update(review);
         return Ok<object?>(null, request.RequestId, "Review deleted successfully");
     }
 }

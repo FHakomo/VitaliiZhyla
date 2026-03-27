@@ -87,7 +87,7 @@ public class ActorsV3Controller : BaseV3Controller
         }
         else
         {
-            this.dbContext.Actors.Remove(actor);
+            actor.IsDeleted = true;
             await this.dbContext.SaveChangesAsync();
             return Ok<object?>(null!, ($"Actor with id {id} deleted successfully. RequestId = {request.RequestId}"));
         }

@@ -7,4 +7,5 @@ public sealed class MovieActor
     public Movie? Movie { get; set; }
     public required int ActorId { get; set; }
     public Actor? Actor { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

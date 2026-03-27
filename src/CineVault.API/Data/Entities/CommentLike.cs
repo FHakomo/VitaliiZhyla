@@ -8,5 +8,6 @@ public sealed class CommentLike
     public Comment? Comment { get; set; }
     public User? User { get; set; }
     public DateTime LikedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; } = false;
 
 }

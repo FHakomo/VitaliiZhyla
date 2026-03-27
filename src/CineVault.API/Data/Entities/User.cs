@@ -10,4 +10,5 @@ public sealed class User
     public ICollection<Comment> Comments { get; set; } = [];
     public ICollection<CommentLike> CommentLikes { get; set; } = [];
     public string? AvatarUrl { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

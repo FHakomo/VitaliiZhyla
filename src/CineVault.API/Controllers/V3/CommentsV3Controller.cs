@@ -90,7 +90,7 @@ public class CommentsV3Controller : BaseV3Controller
         }
         else
         {
-            this.dbContext.Comments.Remove(comment);
+            comment.IsDeleted = true;
             await this.dbContext.SaveChangesAsync();
             return Ok<object?>(null!,($"Comment with id {id} deleted successfully. RequestId = {request.RequestId}"));
         }

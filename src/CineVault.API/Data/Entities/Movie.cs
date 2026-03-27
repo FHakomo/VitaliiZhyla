@@ -11,4 +11,5 @@ public sealed class Movie
     public ICollection<Review> Reviews { get; set; } = [];
     public string? PosterUrl { get; set; }
     public ICollection<MovieActor> MovieActors { get; set; } = [];
+    public bool IsDeleted { get; set; } = false;
 }

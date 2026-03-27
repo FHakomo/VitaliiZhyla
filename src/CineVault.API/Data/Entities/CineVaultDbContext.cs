@@ -17,6 +17,12 @@ public sealed class CineVaultDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Movie>().HasQueryFilter(m => !m.IsDeleted);
+        modelBuilder.Entity<Review>().HasQueryFilter(r => !r.IsDeleted);
+        modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+        modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
+        modelBuilder.Entity<CommentLike>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<Actor>().HasQueryFilter(a => !a.IsDeleted);
         modelBuilder.Entity<Movie>(entity =>
         {
             entity.Property(m => m.Title)

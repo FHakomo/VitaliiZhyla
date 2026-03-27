@@ -10,4 +10,5 @@ public sealed class Movie
     public string? Director { get; set; }
     public ICollection<Review> Reviews { get; set; } = [];
     public string? PosterUrl { get; set; }
+    public ICollection<MovieActor> MovieActors { get; set; } = [];
 }

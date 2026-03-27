@@ -70,5 +70,15 @@ public class MappingConfig : IRegister
                 .Map(dest => dest.Username, src => src.User.Username)
                 .Map(dest => dest.Message, src => src.Message)
                 .Map(dest => dest.CreatedAt, src => src.CreatedAt);
+        //Конфігурація для Actor
+        config.NewConfig<ActorRequest, Actor>()
+            .Map(dest => dest.FullName, src => src.FullName)
+            .Map(dest => dest.BirthDate, src => src.BirthDate)
+            .Map(dest => dest.Biography, src => src.Biography);
+        config.NewConfig<Actor, ActorResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.FullName, src => src.FullName)
+            .Map(dest => dest.BirthDate, src => src.BirthDate)
+            .Map(dest => dest.Biography, src => src.Biography);
     }
 }
